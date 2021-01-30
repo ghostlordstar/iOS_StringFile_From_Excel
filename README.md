@@ -1,0 +1,2 @@
+# iOS_StringFile_From_Excel
+从excel表格中生成iOS的国际化文案
