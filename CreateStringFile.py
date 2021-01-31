@@ -29,7 +29,8 @@ def loadExcel(excelFilePath):
 def filterSheetNames(filtration,sheetNames):
     newNames = sheetNames
     for filter in filtration:
-        newNames.remove(filter)
+        if filter in newNames:
+            newNames.remove(filter)
     return newNames
 
 
@@ -58,7 +59,7 @@ def openAndInitializeStringFile(path):
     if path != None and len(path) > 0:
         tmpStringFile = open(path, 'w')
     else:
-        tmpStringFile = open('Localizable.strings', 'w')
+        tmpStringFile = open('/Users/apple/Desktop/Localizable.strings', 'w')
 
     tmpStringFile.write("""
 /* 
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     logo()
 
     # 读取excel文件
-    excel = loadExcel('/Users/walker/Desktop/lfg_lfgInternational.xlsx')
+    excel = loadExcel('/Users/apple/Desktop/intenational_test.xlsx')
 
     # 过滤不需要的sheet
     needProcessSheetNames = filterSheetNames(['what\'s new','Backend'], excel.sheetnames)
