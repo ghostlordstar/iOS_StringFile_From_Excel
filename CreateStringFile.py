@@ -99,7 +99,7 @@ if __name__ == "__main__":
     needProcessSheetNames = filterSheetNames(['what\'s new','Backend'], excel.sheetnames)
 
     # 创建国际化文件
-    stringFile = openAndInitializeStringFile(None)
+    stringFile = openAndInitializeStringFile('')
 
     # 将指定sheets进行处理，去重
     writeStringFromSheets(needProcessSheetNames, excel)
