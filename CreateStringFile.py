@@ -47,7 +47,7 @@ def filterSheetNames(filtration,sheetNames):
 
 
 # 读取sheet并处理所有文案， 并将处理后的文案保存到`allStringDict`， 将所有key保存到`keys`
-def processSheetStringList(sheetName, wb, valueColumn):
+def processSheetStringList(sheetName, wb, valueColumn, needWriteKeys):
     tmpSheet = wb[sheetName] # 取出指定的sheet
     tmpSheetMaxRow = tmpSheet.max_row
     valueName = tmpSheet["%s1"%valueColumn]
@@ -58,26 +58,27 @@ def processSheetStringList(sheetName, wb, valueColumn):
         value = "%s"%tmpSheet[valueIndex].value
 
         if key != "None" and len(key) > 0 and value != None and len(value) > 0:   # key和value都不为空时写入文件
-            if (key in keys) == False:
-                keys.append(key)
-            else:
-                keys.remove(key)    # 删掉原来的key
-                keys.append(key)    # 将key添加到尾部
+            if needWriteKeys == True:
+                if (key in keys) == False:
+                    keys.append(key)
+                else:
+                    keys.remove(key)    # 删掉原来的key
+                    keys.append(key)    # 将key添加到尾部
             allStringDict[key] = value
     return valueName
 
 # 将处理好的文件写入国际化文件
-def writeAllStringToIntenationalFile():
+def writeAllStringToIntenationalFile(file):
             for key in keys:
                 value = allStringDict[key]
                 if len(value) > 0:
-                    stringFile.write('\"%s\" = \"%s\";\n' %(key, value))
+                    file.write('\"%s\" = \"%s\";\n' %(key, value))
 
 
-# 把指定sheet文案进行处理
-def processAllSheets(sheets, wb):
-    for sheet in sheets:
-        processAllStringList(sheet, wb)
+# # 把指定sheet文案进行处理
+# def processAllSheets(sheets, wb):
+#     for sheet in sheets:
+#         processAllStringList(sheet, wb)
 
 
 # 创建文件并添加文件头
@@ -86,7 +87,7 @@ def create_iOS_InitializeStringFile(path, fileName):
     if path != None and len(path) > 0:
         tmpStringFile = open(path, 'w')
     else:
-        tmpStringFile = open("%s/%s./"%(outPath)
+        tmpStringFile = open("%s/%s"%(outPath,fileName))
 
     tmpStringFile.write("""
     /* 
@@ -101,12 +102,15 @@ def create_iOS_InitializeStringFile(path, fileName):
     return tmpStringFile
 
 def writeInternationalStringToFile(filePath):
-    create_iOS_InitializeStringFile(filePath)
+    file = create_iOS_InitializeStringFile(filePath)
+    writeAllStringToIntenationalFile(file)
+    file.close()
 
 # 转换excel中指定的value为国际化文件
 def convertExcelToString(valueColumn):
-    valueName = processSheetStringList(needProcessSheetNames, excel, valueColumn)
 
+    valueName = processSheetStringList(needProcessSheetNames, excel, valueColumn, len(keys) <= 0)
+    writeInternationalStringToFile("%s/%s/Localizable.strings"%(outPath, valueName))
 
 # main 函数
 if __name__ == "__main__":
@@ -157,16 +161,16 @@ if __name__ == "__main__":
     needProcessSheetNames = filterSheetNames(ignoreSheets, excel.sheetnames)
 
     for vc in valueColumns:
-
+        convertExcelToString(vc)
 
     # 创建国际化文件
     # stringFile = createInitializeStringFile('')
 
     # 将指定sheets进行处理，去重
-    processAllSheets(needProcessSheetNames, excel)
+    # processAllSheets(needProcessSheetNames, excel)
 
     # 将处理好的文案写入文件
-    writeAllStringToIntenationalFile()
+    # writeAllStringToIntenationalFile()
 
     # 关闭文件
     # stringFile.close()
