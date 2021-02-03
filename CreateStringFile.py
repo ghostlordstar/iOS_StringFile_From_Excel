@@ -50,7 +50,7 @@ def filterSheetNames(filtration,sheetNames):
 def processSheetStringList(sheetName, wb, valueColumn, needWriteKeys):
     tmpSheet = wb[sheetName] # 取出指定的sheet
     tmpSheetMaxRow = tmpSheet.max_row
-    valueName = tmpSheet["%s1"%valueColumn]
+    valueName = tmpSheet["%s1"%valueColumn].value
     for row in range(tmpSheetMaxRow):
         keyIndex = "B%s"%(row + 2)  # 从第二行开始读取
         valueIndex = "%s%s"%(valueColumn,row + 2)
@@ -101,16 +101,19 @@ def create_iOS_InitializeStringFile(path, fileName):
     """%time.strftime("%Y/%m/%d %H:%M", time.localtime()))
     return tmpStringFile
 
-def writeInternationalStringToFile(filePath):
-    file = create_iOS_InitializeStringFile(filePath)
+def writeInternationalStringToFile(filePath, fileName):
+    file = create_iOS_InitializeStringFile(filePath, fileName)
     writeAllStringToIntenationalFile(file)
     file.close()
 
 # 转换excel中指定的value为国际化文件
 def convertExcelToString(valueColumn):
-
-    valueName = processSheetStringList(needProcessSheetNames, excel, valueColumn, len(keys) <= 0)
-    writeInternationalStringToFile("%s/%s/Localizable.strings"%(outPath, valueName))
+    valueName = ""
+    for sheetName in needProcessSheetNames:
+        tmpValueName = processSheetStringList(sheetName, excel, valueColumn, len(keys) <= 0)
+        if tmpValueName != None and len(tmpValueName) > 0 and len(valueName) <= 0:
+            valueName = tmpValueName
+    writeInternationalStringToFile("%s/%s/Localizable.strings"%(outPath, valueName), valueName)
 
 # main 函数
 if __name__ == "__main__":
@@ -121,7 +124,7 @@ if __name__ == "__main__":
     # 初始化变量
     keys = []   # key存的数组，用来保存所有的key
     allStringDict = {}  # key value存的字典
-    excelPath = '~/Desktop/International.xlsx'
+    excelPath = '/Users/walker/Desktop/lfg_lfgInternational.xlsx'
     outPath = '~/Desktop/InternationalStrings/'
     keyColumn = 'B'
     valueColumns = ['C']
@@ -155,7 +158,8 @@ if __name__ == "__main__":
     print(excelPath, outPath, keyColumn, valueColumns, ignoreSheets)
 
     # 读取excel文件
-    excel = loadExcel(excelPath)
+    print(excelPath)
+    excel = load_workbook(filename=excelPath)
 
     # 过滤不需要的sheet
     needProcessSheetNames = filterSheetNames(ignoreSheets, excel.sheetnames)
