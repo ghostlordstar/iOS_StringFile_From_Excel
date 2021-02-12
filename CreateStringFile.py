@@ -2,6 +2,7 @@
 
 import time
 import sys
+import os
 from openpyxl import load_workbook
 
 def logo():
@@ -74,35 +75,30 @@ def writeAllStringToIntenationalFile(file):
                 if len(value) > 0:
                     file.write('\"%s\" = \"%s\";\n' %(key, value))
 
-
-# # 把指定sheet文案进行处理
-# def processAllSheets(sheets, wb):
-#     for sheet in sheets:
-#         processAllStringList(sheet, wb)
-
-
 # 创建文件并添加文件头
-def create_iOS_InitializeStringFile(path, fileName):
-    tmpStringFile = None
+def create_iOS_InitializeStringFile(path):
     if path != None and len(path) > 0:
-        tmpStringFile = open(path, 'w')
-    else:
-        tmpStringFile = open("%s/%s"%(outPath,fileName))
+        if os.path.exists(path) == False:
+            os.makedirs(path)
+        tmpStringFile = open('%s/Localizable.strings'%path, 'w')
 
-    tmpStringFile.write("""
-    /* 
-      Localizable.strings
-      Playhouse
-    
-      Created by walker on %s.
-      Copyright © 2021 LFG. All rights reserved.
-    */
-    
-    """%time.strftime("%Y/%m/%d %H:%M", time.localtime()))
+    if tmpStringFile != None:
+        tmpStringFile.write("""
+/* 
+  Localizable.strings
+  Playhouse
+
+  Created by walker on %s.
+  Copyright © 2021 LFG. All rights reserved.
+*/
+
+
+"""%time.strftime("%Y/%m/%d %H:%M", time.localtime()))
     return tmpStringFile
 
-def writeInternationalStringToFile(filePath, fileName):
-    file = create_iOS_InitializeStringFile(filePath, fileName)
+# 写入国际化文件
+def writeInternationalStringToFile(filePath):
+    file = create_iOS_InitializeStringFile(filePath)
     writeAllStringToIntenationalFile(file)
     file.close()
 
@@ -113,21 +109,21 @@ def convertExcelToString(valueColumn):
         tmpValueName = processSheetStringList(sheetName, excel, valueColumn, len(keys) <= 0)
         if tmpValueName != None and len(tmpValueName) > 0 and len(valueName) <= 0:
             valueName = tmpValueName
-    writeInternationalStringToFile("%s/%s/Localizable.strings"%(outPath, valueName), valueName)
+    writeInternationalStringToFile("%s/%s/"%(outPath, valueName))
 
 # main 函数
 if __name__ == "__main__":
-
+    # 显示logo
     logo()
-    
-    print(sys.argv)
+    # 输出传入参数
+    print('传入参数为：%s'%sys.argv)
     # 初始化变量
     keys = []   # key存的数组，用来保存所有的key
     allStringDict = {}  # key value存的字典
-    excelPath = '/Users/walker/Desktop/lfg_lfgInternational.xlsx'
-    outPath = '~/Desktop/InternationalStrings/'
+    excelPath = '/Users/apple/Desktop/intenational_test.xlsx'
+    outPath = 'InternationalStrings'
     keyColumn = 'B'
-    valueColumns = ['C']
+    valueColumns = ['C'] # 默认转换的国际化列名称
     ignoreSheets = ['what\'s new','Backend']
 
     for tmpArg in sys.argv:
@@ -154,27 +150,14 @@ if __name__ == "__main__":
         elif '--ignoreSheets=' in tmpArg:
             ignoreSheets = tmpArg.replace('--ignoreSheets=', '').upper().split(',')
 
-
-    print(excelPath, outPath, keyColumn, valueColumns, ignoreSheets)
+    #print(excelPath, outPath, keyColumn, valueColumns, ignoreSheets)
 
     # 读取excel文件
-    print(excelPath)
     excel = load_workbook(filename=excelPath)
 
     # 过滤不需要的sheet
     needProcessSheetNames = filterSheetNames(ignoreSheets, excel.sheetnames)
 
+    # 遍历转换所有国际化文案
     for vc in valueColumns:
         convertExcelToString(vc)
-
-    # 创建国际化文件
-    # stringFile = createInitializeStringFile('')
-
-    # 将指定sheets进行处理，去重
-    # processAllSheets(needProcessSheetNames, excel)
-
-    # 将处理好的文案写入文件
-    # writeAllStringToIntenationalFile()
-
-    # 关闭文件
-    # stringFile.close()
