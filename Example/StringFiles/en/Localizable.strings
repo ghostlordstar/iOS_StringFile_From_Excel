@@ -1,0 +1,17 @@
+
+/* 
+  Localizable.strings
+  YourProjectName
+
+  Created by walker on 2022/01/21 01:35.
+  Copyright © 2022 YourProjectName. All rights reserved.
+*/
+
+
+"bbb" = "222";
+"aaa" = "333";
+"ccc" = "en444";
+"ddd" = "en555";
+"alert_ok" = "OK";
+"alert_title" = "Tips";
+"alert_cancel" = "Cancel";
