@@ -51,7 +51,7 @@ def processSheetStringList(sheetName, wb, valueColumn, needWriteKeys):
     tmpSheetMaxRow = tmpSheet.max_row
     valueName = tmpSheet["%s1"%valueColumn].value
     for row in range(tmpSheetMaxRow):
-        keyIndex = "B%s"%(row + 2)  # 从第二行开始读取
+        keyIndex = "%s%s"%(keyColumn, row + 2)  # 从第二行开始读取
         valueIndex = "%s%s"%(valueColumn,row + 2)
         key = "%s"%tmpSheet[keyIndex].value
         value = "%s"%tmpSheet[valueIndex].value
