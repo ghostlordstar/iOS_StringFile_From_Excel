@@ -15,7 +15,7 @@
 
 ## 准备工作：
 1. python3环境
-2. 安装`openpyxl`插件(可用命令`pip3 install openpyxl`命令安装`安装)
+2. 安装`openpyxl`插件(可用命令`pip3 install openpyxl`安装)
 
 ## 用法:
 ```commandline
